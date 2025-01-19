@@ -1,0 +1,42 @@
+
+ Steps for modeling Expected loss
+Expected loss = EAD*PD*LGD
+
+EAD(Exposure at default)
+1. Calculate the UGD - Usage Given Default is the percentage of committed yet undrawn balance  that is assumed to be drawn in the case of default 
+. We add the Notional of the bonds outstanding  to the Unused commitment*UGD(UGD here would be given by the credit rating the company currently is in.
+The Outstanding bond has a notional of 500M + 500M of unused commitment*.65(UGD) = 825M.
+
+2.PD(probability of default) - We are using the merton model. We require the below parameters for calculating PD
+* WE take the firm value which is the total assets - 19.57
+* Expected return - 6%(historical average return)
+* Time - 1 year
+* Volatility - 44.7%(Historical asset level)
+*Maximum of Short term liabilities - 8.38M
+*Maximum of long term liabilities - 20.38M 
+Using the values for Short term Liabilities and Long Term Liabilities we can set a default point ie if both the short term and long term liabilities sum to greater than 12.5M
+Distance to default formula = (Ln(Firm value 19.57/Default point - 12.5) + Expected return - 6% - (Volatility(44.7%)^2/2)*Time - 1 year)/(Volatility(44.7%)*Time - 1 year)
+PD = normal distribution(-Distance to default) = 13.85%
+
+3.LGD(loss given default) - Using Beta distribution(Beta distribution is a continuous distribution with the parameters Alpha and Beta)
+For reference I have used the formula given in the Moody's model for predicting loss given default 
+Key Variables:
+
+*avg_LGD_on_bonds: The average Loss Given Default on bonds.
+*std: The standard deviation of the LGD values.
+*max_for_bonds: The maximum allowable value for the LGD in the calculations.
+*Function Explanation:
+
+LGD_calculations(avg, std, max_value):
+*alpha: A variable calculated based on the average LGD value, maximum value, and standard deviation.
+*beta: Derived from alpha, providing further adjustment for the recovery calculation.
+mean_recovery: Represents the average recovery rate calculated using alpha and beta.
+*LGD: The final Loss Given Default value, representing the proportion of loss.
+The result is printed as a percentage, indicating the expected loss rate given a default event.
+
+Important Consideration: The calculation assumes certain relationships between the average, maximum, and standard deviation of LGD values. These assumptions may need to be adjusted based on the specific context or dataset used.
+
+
+4. EL(Expected Loss) - It is a metric that estimates the average potential loss from a default, calculated by multiplying the exposure at default (EAD), loss given default (LGD), and probability of default (PD) in our case :
+EAD = 825M , PD = 13.85%, LGD = 48.75%
+EL = (EAD*PD*LGD)/(100*100) = $55710091.760292605
