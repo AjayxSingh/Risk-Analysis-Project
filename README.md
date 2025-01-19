@@ -1,42 +1,110 @@
+# Expected Loss Modeling
 
- Steps for modeling Expected loss
-Expected loss = EAD*PD*LGD
+This repository provides an overview and calculation methodology for estimating **Expected Loss (EL)** using the formula:
 
-EAD(Exposure at default)
-1. Calculate the UGD - Usage Given Default is the percentage of committed yet undrawn balance  that is assumed to be drawn in the case of default 
-. We add the Notional of the bonds outstanding  to the Unused commitment*UGD(UGD here would be given by the credit rating the company currently is in.
-The Outstanding bond has a notional of 500M + 500M of unused commitment*.65(UGD) = 825M.
+\[ \text{Expected Loss (EL)} = \text{EAD} \times \text{PD} \times \text{LGD} \]
 
-2.PD(probability of default) - We are using the merton model. We require the below parameters for calculating PD
-* WE take the firm value which is the total assets - 19.57
-* Expected return - 6%(historical average return)
-* Time - 1 year
-* Volatility - 44.7%(Historical asset level)
-*Maximum of Short term liabilities - 8.38M
-*Maximum of long term liabilities - 20.38M 
-Using the values for Short term Liabilities and Long Term Liabilities we can set a default point ie if both the short term and long term liabilities sum to greater than 12.5M
-Distance to default formula = (Ln(Firm value 19.57/Default point - 12.5) + Expected return - 6% - (Volatility(44.7%)^2/2)*Time - 1 year)/(Volatility(44.7%)*Time - 1 year)
-PD = normal distribution(-Distance to default) = 13.85%
+### Key Components
 
-3.LGD(loss given default) - Using Beta distribution(Beta distribution is a continuous distribution with the parameters Alpha and Beta)
-For reference I have used the formula given in the Moody's model for predicting loss given default 
-Key Variables:
+#### 1. **EAD (Exposure at Default)**
+The **Exposure at Default** represents the total exposure the lender has when a borrower defaults.
 
-*avg_LGD_on_bonds: The average Loss Given Default on bonds.
-*std: The standard deviation of the LGD values.
-*max_for_bonds: The maximum allowable value for the LGD in the calculations.
-*Function Explanation:
+- **UGD (Usage Given Default):**
+  - The percentage of the committed yet undrawn balance assumed to be drawn in case of default.
+  - Formula:
+    \[
+    \text{EAD} = \text{Outstanding Bonds} + \text{Unused Commitment} \times \text{UGD}
+    \]
+- **Example Calculation:**
+  - Outstanding Bond Notional: **500M**
+  - Unused Commitment: **500M**
+  - UGD: **65%**
+  - \[
+    \text{EAD} = 500M + 500M \times 0.65 = 825M
+    \]
 
-LGD_calculations(avg, std, max_value):
-*alpha: A variable calculated based on the average LGD value, maximum value, and standard deviation.
-*beta: Derived from alpha, providing further adjustment for the recovery calculation.
-mean_recovery: Represents the average recovery rate calculated using alpha and beta.
-*LGD: The final Loss Given Default value, representing the proportion of loss.
-The result is printed as a percentage, indicating the expected loss rate given a default event.
+#### 2. **PD (Probability of Default)**
+The **Probability of Default** is calculated using the **Merton Model**. The required parameters are:
 
-Important Consideration: The calculation assumes certain relationships between the average, maximum, and standard deviation of LGD values. These assumptions may need to be adjusted based on the specific context or dataset used.
+- **Firm Value (Total Assets):** 19.57
+- **Expected Return:** 6% (historical average return)
+- **Time Horizon:** 1 year
+- **Volatility:** 44.7% (historical asset level)
+- **Short-Term Liabilities:** 8.38M
+- **Long-Term Liabilities:** 20.38M
+- **Default Point:** Sum of liabilities exceeding **12.5M**
 
+**Distance to Default Formula:**
+\[
+\text{Distance to Default} = \frac{\ln\left(\frac{\text{Firm Value}}{\text{Default Point}}\right) + (\text{Expected Return} - \frac{\text{Volatility}^2}{2}) \times \text{Time}}{\text{Volatility} \times \sqrt{\text{Time}}}
+\]
 
-4. EL(Expected Loss) - It is a metric that estimates the average potential loss from a default, calculated by multiplying the exposure at default (EAD), loss given default (LGD), and probability of default (PD) in our case :
-EAD = 825M , PD = 13.85%, LGD = 48.75%
-EL = (EAD*PD*LGD)/(100*100) = $55710091.760292605
+**Example:**
+- \[
+  \text{Distance to Default} = \frac{\ln(19.57 / 12.5) + (0.06 - (0.447^2)/2) \times 1}{0.447 \times \sqrt{1}} = \text{Calculated Value}
+  \]
+- \[
+  \text{PD} = \text{Normal Distribution}(-\text{Distance to Default}) = 13.85\%
+  \]
+
+#### 3. **LGD (Loss Given Default)**
+The **Loss Given Default** represents the percentage of exposure that will not be recovered in case of default. It is modeled using a **Beta Distribution**.
+
+**Key Variables:**
+- **avg_LGD_on_bonds:** Average LGD on bonds.
+- **std:** Standard deviation of the LGD values.
+- **max_for_bonds:** Maximum allowable value for LGD in calculations.
+
+**Calculation:**
+- **alpha** and **beta** are derived from average LGD, standard deviation, and maximum value.
+- **Mean Recovery Rate:** Represents the recovery percentage.
+- \[
+  \text{LGD} = \text{Calculated as } 48.75\%
+  \]
+
+#### 4. **Expected Loss (EL)**
+Finally, the Expected Loss is calculated using:
+\[
+\text{EL} = \frac{\text{EAD} \times \text{PD} \times \text{LGD}}{100 \times 100}
+\]
+
+**Example Calculation:**
+- **EAD:** 825M
+- **PD:** 13.85%
+- **LGD:** 48.75%
+- \[
+  \text{EL} = \frac{825M \times 13.85 \times 48.75}{100 \times 100} = \$55,710,091.76
+  \]
+
+---
+
+### Repository Structure
+- **README.md**: Documentation and explanation of the EL calculation methodology.
+- **Scripts/**: Python/R scripts for automating the calculations.
+- **Examples/**: Sample data and worked-out examples.
+
+### Prerequisites
+- Basic understanding of financial terms such as EAD, PD, and LGD.
+- Familiarity with statistical distributions (e.g., Beta Distribution).
+- Software tools such as Python, R, or Excel for implementing the formulas.
+
+---
+
+### Use Cases
+- **Credit Risk Assessment:** Estimating potential losses for financial institutions.
+- **Regulatory Compliance:** Meeting Basel III or other regulatory requirements.
+- **Portfolio Management:** Managing risk and optimizing returns.
+
+### Contributions
+Contributions and suggestions to improve the methodology or code are welcome. Please raise an issue or submit a pull request.
+
+### References
+- Moody’s Model for Loss Given Default.
+- Merton Model for Probability of Default.
+- Historical Financial Data for Volatility and Expected Returns.
+
+---
+
+### License
+This project is licensed under the MIT License. See the LICENSE file for details.
+
