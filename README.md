@@ -95,16 +95,9 @@ Finally, the Expected Loss is calculated using:
 - **Regulatory Compliance:** Meeting Basel III or other regulatory requirements.
 - **Portfolio Management:** Managing risk and optimizing returns.
 
-### Contributions
-Contributions and suggestions to improve the methodology or code are welcome. Please raise an issue or submit a pull request.
-
 ### References
 - Moody’s Model for Loss Given Default.
 - Merton Model for Probability of Default.
 - Historical Financial Data for Volatility and Expected Returns.
 
----
-
-### License
-This project is licensed under the MIT License. See the LICENSE file for details.
 
